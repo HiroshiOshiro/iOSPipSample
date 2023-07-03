@@ -117,7 +117,13 @@ extension CategoryListViewController {
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
   ) {
-    guard let videoURL = Bundle.main.url(forResource: "rick", withExtension: "mp4") else {
+    // Local file
+    //    guard let videoURL = Bundle.main.url(forResource: "rick", withExtension: "mp4") else
+    // MP4
+    //    guard let videoURL = URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4") else
+    // m3u8
+    guard let videoURL = URL(string: "http://sample.vodobox.com/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8") else
+    {
       return
     }
 
