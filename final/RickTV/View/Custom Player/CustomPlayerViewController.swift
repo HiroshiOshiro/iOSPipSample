@@ -32,6 +32,7 @@
 
 import UIKit
 import AVKit
+import MediaPlayer
 
 /// The Set of custom player controllers currently using or transitioning out of PiP
 private var activeCustomPlayerViewControllers = Set<CustomPlayerViewController>()
@@ -84,6 +85,9 @@ public class CustomPlayerViewController: UIViewController {
     #endif
 
     view.addGestureRecognizer(tapGestureRecognizer)
+
+    setupNowPlayingInfo()
+    addRemoteCommandEvent()
   }
 
   override public func viewDidLayoutSubviews() {
@@ -143,6 +147,60 @@ public class CustomPlayerViewController: UIViewController {
 
     // Reset the safe area inset to its default value.
     additionalSafeAreaInsets = .zero
+  }
+
+  
+}
+
+// MARK: For Remote Command
+extension CustomPlayerViewController {
+  func setupNowPlayingInfo() {
+    MPNowPlayingInfoCenter.default().nowPlayingInfo = [
+        MPMediaItemPropertyTitle: "Never Gonna Give Up",
+        MPMediaItemPropertyArtist : "Rick",
+//        MPNowPlayingInfoPropertyPlaybackRate : NSNumber(value: 1.0), //再生レート
+//        MPMediaItemPropertyPlaybackDuration : player?.currentItem?.duration ?? NSNumber(value: 0) //シークバー
+    ]
+  }
+
+  func addRemoteCommandEvent() {
+      let commandCenter = MPRemoteCommandCenter.shared()
+      commandCenter.togglePlayPauseCommand.addTarget(handler: { [unowned self] commandEvent -> MPRemoteCommandHandlerStatus in
+          self.remoteTogglePlayPause(commandEvent)
+          return MPRemoteCommandHandlerStatus.success
+
+      })
+      commandCenter.playCommand.addTarget(handler: { [unowned self] commandEvent -> MPRemoteCommandHandlerStatus in
+          self.remotePlay(commandEvent)
+        player?.play()
+          return MPRemoteCommandHandlerStatus.success
+      })
+      commandCenter.pauseCommand.addTarget(handler: { [unowned self] commandEvent -> MPRemoteCommandHandlerStatus in
+          self.remotePause(commandEvent)
+        player?.pause()
+          return MPRemoteCommandHandlerStatus.success
+      })
+  }
+
+  func remoteTogglePlayPause(_ event: MPRemoteCommandEvent) {
+      // イヤホンのセンターボタンを押した時の処理
+      print("イヤホンのセンターボタンを押した時の処理")
+    // Do nothing
+  }
+
+  func remotePlay(_ event: MPRemoteCommandEvent) {
+      // プレイボタンが押された時の処理
+      print("プレイボタンが押された時の処理")
+      // （今回は再生をおこなっています）
+    player?.play()
+
+  }
+
+  func remotePause(_ event: MPRemoteCommandEvent) {
+      // ポーズボタンが押された時の処理
+      print("ポーズが押された時の処理")
+      // （今回は停止をおこなっています）
+    player?.pause()
   }
 }
 
